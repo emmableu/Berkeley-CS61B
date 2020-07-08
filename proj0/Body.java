@@ -1,3 +1,5 @@
+import examples.StdDraw;
+
 public class Body {
     public double xxPos, yyPos, xxVel, yyVel, mass;
     public String imgFileName;
@@ -81,5 +83,10 @@ public class Body {
 
         xxPos += xxVel*dt;
         yyPos += yyVel*dt;
+    }
+
+    public void draw(){
+        /* Stamps three copies of advice.png in a triangular pattern. */
+        StdDraw.picture(xxPos, yyPos, "images/"+imgFileName);
     }
 }
