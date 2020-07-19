@@ -13,23 +13,54 @@ public class ArrayDeque<T> {
 
     }
 
-//    public ArrayDeque(ArrayDeque other) {
-//        for (int i = 0; i < other.size(); i++) {
-//            addLast(other.get(i));
-//        }
-//    }
+    public ArrayDeque(ArrayDeque other) {
+        items = (T[]) new Object[other.items.length];
+        for (int i = 0; i < other.items.length; i++) {
+            items[i] = (T) other.items[i];
+        }
+        size = other.size;
+        nextFirst = other.nextFirst;
+        nextLast = other.nextLast;
+    }
 
     public void addFirst(T item) {
         items[nextFirst] = item;
         size++;
 
-        if (nextFirst == 0 || nextFirst - nextLast == 1){
-            int newSize = 3*items.length;
+        if (nextFirst == nextLast){
+            int newSize = 3*size;
             resizeToBigger(newSize);
         }
+
+        else if (nextFirst == 0){
+            nextFirst = items.length - 1;
+        }
+
         else{
             nextFirst --;
         }
+        System.out.print("after add first: ");
+        printDeque();
+    }
+    public void addLast(T item) {
+        items[nextLast] = item;
+        size++;
+
+        if (nextFirst == nextLast){
+            int newSize = 3*size;
+            resizeToBigger(newSize);
+        }
+
+        else if (nextLast == items.length - 1){
+            nextLast = 0;
+        }
+
+        else{
+            nextLast ++;
+        }
+
+        System.out.print("after add last: ");
+        printDeque();
     }
 
     /*
@@ -42,6 +73,7 @@ public class ArrayDeque<T> {
 
     what happens when resize to smaller:
     - only do this when the data is of 1/9 size
+    - make it 1/3 size
     - only need to loop the data and start when the data is not null
     - no need to resort
     - resize it to the same, but add buffer to before and after
@@ -53,9 +85,11 @@ public class ArrayDeque<T> {
         printDeque();
         T[] newItems = (T[]) new Object[newSize];
         for (int i = 0; i < size; i ++) {
-            newItems[size + i] = items[i];
+            newItems[size + i] = items[(i + nextFirst)%size];
         }
         items = newItems;
+        nextFirst = size - 1;
+        nextLast = size*2;
         System.out.println("after resize to bigger");
         printDeque();
     }
@@ -65,19 +99,20 @@ public class ArrayDeque<T> {
         printDeque();
         T[] newItems = (T[]) new Object[newSize];
         for (int i = 0; i < size; i ++) {
-            newItems[i] = items[i];
+            newItems[size + i] = items[(i + nextFirst+1)%items.length];
         }
         items = newItems;
+        nextFirst = size - 1;
+        if (isEmpty()){
+            nextFirst = 0;
+        }
+        nextLast = size*2;
         System.out.println("after resize to smaller");
         printDeque();
     }
 
-    public void addLast(T item) {
-        size++;
-    }
-
     public boolean isEmpty() {
-        return true;
+        return size == 0;
     }
 
     public int size() {
@@ -85,26 +120,43 @@ public class ArrayDeque<T> {
     }
 
     public void printDeque() {
+        System.out.print("size:" + size() + " ");
         System.out.print("[");
         for (int i = 0; i < items.length; i ++ ) {
             System.out.print(items[i] + ", ");
         }
-        System.out.print("]");
+        System.out.print("] " + nextFirst + " " + nextLast);
         System.out.println("");
     }
 
     public T removeFirst() {
+        int firstIndex = (nextFirst + 1)%items.length;
+        T first = items[firstIndex];
+        items[firstIndex] = null;
         size --;
-        return null;
+        nextFirst = firstIndex;
+        if (size <= items.length/9){
+            resizeToSmaller(items.length/3);
+        }
+        printDeque();
+        return first;
     }
 
     public T removeLast() {
+        int lastIndex = (nextLast - 1)%items.length;
+        T last = items[lastIndex];
+        items[lastIndex] = null;
         size --;
-        return null;
+        nextLast = lastIndex;
+        if (size <= items.length/9){
+            resizeToSmaller(items.length/3);
+        }
+        printDeque();
+        return last;
     }
 
     public T get(int index) {
-        return null;
+        return items[(index + nextFirst + 1)%items.length];
     }
 
 }
