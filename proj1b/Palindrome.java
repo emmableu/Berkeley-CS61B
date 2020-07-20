@@ -6,4 +6,24 @@ public class Palindrome {
         }
         return d;
     }
+
+    public boolean isPalindrome(String word){
+        Deque<Character> d = wordToDeque(word);
+        return dequeIsPalindrome(d);
+    }
+
+    public boolean dequeIsPalindrome(Deque<Character> d){
+        if (d.size() <= 1){
+            return true;
+        }
+
+        Character f = d.removeFirst();
+        Character l = d.removeLast();
+
+        if (f != l) {
+            return false;
+        }
+        return dequeIsPalindrome(d);
+
+    }
 }
